@@ -65,16 +65,16 @@ func (ll LinearLayout) Layout(gtx C, children ...layout.FlexChild) D {
 							return fill(gtx, background)
 						}
 
-						if ll.Clickable.Hover && ll.Clickable.button.Hovered() {
+						if ll.Clickable.Hover && ll.Clickable.Button.Hovered() {
 							background = ll.Clickable.style.HoverColor
 						}
 						fill(gtx, background)
 
-						for _, c := range ll.Clickable.button.History() {
+						for _, c := range ll.Clickable.Button.History() {
 							drawInk(gtx, c, ll.Clickable.style.Color)
 						}
 
-						return ll.Clickable.button.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return ll.Clickable.Button.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 							semantic.Button.Add(gtx.Ops)
 							return layout.Dimensions{Size: gtx.Constraints.Min}
 						})
@@ -96,7 +96,7 @@ func (ll LinearLayout) Layout(gtx C, children ...layout.FlexChild) D {
 
 			if ll.Shadow != nil {
 				if ll.Clickable != nil && ll.Clickable.Hover {
-					if ll.Clickable.button.Hovered() {
+					if ll.Clickable.Button.Hovered() {
 						return ll.Shadow.Layout(gtx, wdg)
 					}
 					return wdg(gtx)
@@ -152,15 +152,15 @@ func (ll LinearLayout) GradientLayout(gtx C, children ...layout.FlexChild) D {
 							}
 						}
 
-						if ll.Clickable.Hover && ll.Clickable.button.Hovered() {
+						if ll.Clickable.Hover && ll.Clickable.Button.Hovered() {
 							fill(gtx, ll.Background)
 						}
 
-						for _, c := range ll.Clickable.button.History() {
+						for _, c := range ll.Clickable.Button.History() {
 							drawInk(gtx, c, ll.Clickable.style.Color)
 						}
 
-						return ll.Clickable.button.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return ll.Clickable.Button.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 							semantic.Button.Add(gtx.Ops)
 
 							return layout.Dimensions{
@@ -185,7 +185,7 @@ func (ll LinearLayout) GradientLayout(gtx C, children ...layout.FlexChild) D {
 
 			if ll.Shadow != nil {
 				if ll.Clickable != nil && ll.Clickable.Hover {
-					if ll.Clickable.button.Hovered() {
+					if ll.Clickable.Button.Hovered() {
 						return ll.Shadow.Layout(gtx, wdg)
 					}
 					return wdg(gtx)

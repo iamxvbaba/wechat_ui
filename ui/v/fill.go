@@ -15,7 +15,7 @@ func Fill(gtx layout.Context, col color.NRGBA) layout.Dimensions {
 
 func fill(gtx layout.Context, col color.NRGBA) layout.Dimensions {
 	cs := gtx.Constraints
-	d := image.Point{X: cs.Min.X, Y: cs.Min.Y}
+	d := image.Point{X: cs.Max.X, Y: cs.Max.Y}
 	track := image.Rectangle{
 		Max: d,
 	}

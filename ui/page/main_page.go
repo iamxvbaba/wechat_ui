@@ -2,6 +2,7 @@ package page
 
 import (
 	"context"
+	"fmt"
 	"gioui.org/io/key"
 	"gioui.org/layout"
 	"gioui.org/unit"
@@ -77,7 +78,25 @@ func (mp *MainPage) initNavItems() {
 			PageID:        contact.PageID,
 		},
 	}
-	mp.drawerNav = components.NewNavDrawer(mp.CurrentPageID(), navItems)
+
+	utilItems := []components.NavHandler{
+		{
+			Clickable:     v.NewClickable(false),
+			ImageInactive: v.SpIconInactive,
+			Title:         "小程序",
+		},
+		{
+			Clickable:     v.NewClickable(false),
+			ImageInactive: v.PhoneInactive,
+			Title:         "手机",
+		},
+		{
+			Clickable:     v.NewClickable(false),
+			ImageInactive: v.MoreInactive,
+			Title:         "更多",
+		},
+	}
+	mp.drawerNav = components.NewNavDrawer(mp.CurrentPageID(), navItems, utilItems)
 }
 
 // OnNavigatedTo is called when the page is about to be displayed and
@@ -125,6 +144,12 @@ func (mp *MainPage) HandleUserInteractions() {
 			mp.Display(pg)
 		}
 	}
+	// 加载左侧工具栏
+	for _, item := range mp.drawerNav.DrawerUtilItems {
+		for item.Clickable.Clicked() {
+			fmt.Println("点击工具栏:", item.Title)
+		}
+	}
 }
 
 // KeysToHandle 监听的键盘事件
@@ -166,10 +191,9 @@ func (mp *MainPage) Layout(gtx C) D {
 }
 
 func (mp *MainPage) layoutDesktop(gtx C) D {
-	return v.LinearLayout{
-		Width:       v.MatchParent,
-		Height:      v.MatchParent,
-		Orientation: layout.Horizontal,
+	gtx.Constraints = layout.Exact(gtx.Constraints.Max)
+	return layout.Flex{
+		Axis: layout.Horizontal,
 	}.Layout(gtx,
 		layout.Rigid(mp.drawerNav.Layout),
 		layout.Rigid(func(gtx C) D {
@@ -177,6 +201,6 @@ func (mp *MainPage) layoutDesktop(gtx C) D {
 				return D{}
 			}
 			return mp.CurrentPage().Layout(gtx)
-		}),
-	)
+		}))
+
 }

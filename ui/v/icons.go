@@ -7,4 +7,8 @@ var (
 	ContactIconInactive = NewImage(assets.IconList["contact_inactive"])
 	MsgIcon             = NewImage(assets.IconList["msg"])
 	MsgIconInactive     = NewImage(assets.IconList["msg_inactive"])
+
+	SpIconInactive = NewImage(assets.IconList["sp_inactive"])
+	PhoneInactive  = NewImage(assets.IconList["phone_inactive"])
+	MoreInactive   = NewImage(assets.IconList["more_inactive"])
 )

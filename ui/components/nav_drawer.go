@@ -20,8 +20,10 @@ type NavHandler struct {
 }
 
 type NavDrawer struct {
-	DrawerNavItems []NavHandler
-	CurrentPage    string
+	DrawerNavItems  []NavHandler
+	DrawerUtilItems []NavHandler
+
+	CurrentPage string
 
 	axis      layout.Axis
 	textSize  unit.Sp
@@ -31,7 +33,7 @@ type NavDrawer struct {
 	direction layout.Direction
 }
 
-func NewNavDrawer(curPage string, navItems []NavHandler) NavDrawer {
+func NewNavDrawer(curPage string, navItems, utilItems []NavHandler) NavDrawer {
 	nd := NavDrawer{}
 	nd.axis = layout.Vertical
 	nd.textSize = values.TextSize12
@@ -41,56 +43,57 @@ func NewNavDrawer(curPage string, navItems []NavHandler) NavDrawer {
 	nd.direction = layout.Center
 	nd.CurrentPage = curPage
 	nd.DrawerNavItems = navItems
+	nd.DrawerUtilItems = utilItems
 	return nd
 }
-func (nd *NavDrawer) Layout(gtx layout.Context) layout.Dimensions {
-	return v.LinearLayout{
-		Width:       gtx.Dp(nd.width),
-		Height:      v.MatchParent,
-		Orientation: layout.Vertical,
-		Background:  values.DarkGray, //values.Surface,
+func (nd *NavDrawer) Layout(gtx C) D {
+	gtx.Constraints.Max.X = gtx.Dp(nd.width)
+	gtx.Constraints.Min.Y = gtx.Constraints.Max.Y
+
+	// 填充背景色
+	v.Fill(gtx, values.DarkGray)
+
+	return layout.Flex{
+		Axis:    nd.axis,
+		Spacing: layout.SpaceBetween,
 	}.Layout(gtx,
+		// 页面导航类
 		layout.Rigid(func(gtx C) D {
-			list := layout.List{Axis: layout.Vertical}
+			list := layout.List{Axis: nd.axis, Alignment: nd.alignment}
 			return list.Layout(gtx, len(nd.DrawerNavItems), func(gtx C, i int) D {
-				mGtx := gtx
-				background := values.DarkGray //values.Surface
+				gtx.Constraints.Min.X = gtx.Constraints.Max.X
+				item := nd.DrawerNavItems[i]
+				img := item.ImageInactive
+				if item.PageID == nd.CurrentPage {
+					img = item.Image
+				}
+				return item.Clickable.Button.Layout(gtx, func(gtx C) D {
+					return layout.UniformInset(values.MarginPadding10).Layout(gtx, func(gtx C) D {
+						return nd.direction.Layout(gtx, img.Layout20dp)
+					})
+				})
+			})
+		}),
 
-				//if nd.DrawerNavItems[i].PageID == nd.CurrentPage {
-				//	background = values.Gray5
-				//}
-				return v.LinearLayout{
-					Orientation: nd.axis,
-					Width:       v.MatchParent,
-					Height:      v.WrapContent,
-					Padding:     layout.UniformInset(values.MarginPadding10),
-					Alignment:   nd.alignment,
-					Direction:   nd.direction,
-					Background:  background,
-					Clickable:   nd.DrawerNavItems[i].Clickable,
-				}.Layout(mGtx,
-					layout.Rigid(func(gtx C) D {
-						img := nd.DrawerNavItems[i].ImageInactive
+		// 占位并且可移动窗口
+		layout.Flexed(1, func(gtx C) D {
+			return v.LayoutMove(gtx, func(gtx C) D {
+				return D{Size: gtx.Constraints.Max}
+			})
+		}),
 
-						if nd.DrawerNavItems[i].PageID == nd.CurrentPage {
-							img = nd.DrawerNavItems[i].Image
-						}
-						return img.Layout18dp(gtx)
-					}),
-					//layout.Rigid(func(gtx C) D {
-					//	return layout.Inset{
-					//		Left: nd.leftInset,
-					//	}.Layout(gtx, func(gtx C) D {
-					//		textColor := values.GrayText1
-					//		if nd.DrawerNavItems[i].PageID == nd.CurrentPage {
-					//			textColor = values.DeepBlue
-					//		}
-					//		txt := v.NewLabel(nd.textSize, nd.DrawerNavItems[i].Title)
-					//		txt.Color = textColor
-					//		return txt.Layout(gtx)
-					//	})
-					//}),
-				)
+		// 工具类
+		layout.Rigid(func(gtx C) D {
+			list := layout.List{Axis: nd.axis, Alignment: nd.alignment}
+			return list.Layout(gtx, len(nd.DrawerUtilItems), func(gtx C, i int) D {
+				gtx.Constraints.Min.X = gtx.Constraints.Max.X
+				item := nd.DrawerUtilItems[i]
+				img := item.ImageInactive
+				return item.Clickable.Button.Layout(gtx, func(gtx C) D {
+					return layout.UniformInset(values.MarginPadding10).Layout(gtx, func(gtx C) D {
+						return nd.direction.Layout(gtx, img.Layout20dp)
+					})
+				})
 			})
 		}),
 	)

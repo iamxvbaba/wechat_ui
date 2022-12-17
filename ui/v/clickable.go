@@ -12,7 +12,7 @@ import (
 )
 
 type Clickable struct {
-	button    *widget.Clickable
+	Button    *widget.Clickable
 	style     *values.ClickableStyle
 	Hover     bool
 	Radius    CornerRadius
@@ -21,7 +21,7 @@ type Clickable struct {
 
 func NewClickable(hover bool) *Clickable {
 	return &Clickable{
-		button:    &widget.Clickable{},
+		Button:    &widget.Clickable{},
 		style:     &values.ClickableStyle{Color: values.SurfaceHighlight, HoverColor: values.Gray5},
 		Hover:     hover,
 		isEnabled: true,
@@ -37,11 +37,11 @@ func (cl *Clickable) ChangeStyle(style *values.ClickableStyle) {
 }
 
 func (cl *Clickable) Clicked() bool {
-	return cl.button.Clicked()
+	return cl.Button.Clicked()
 }
 
 func (cl *Clickable) IsHovered() bool {
-	return cl.button.Hovered()
+	return cl.Button.Hovered()
 }
 
 // SetEnabled enables/disables the clickable.
@@ -61,7 +61,7 @@ func (cl *Clickable) Enabled() bool {
 }
 
 func (cl *Clickable) Layout(gtx C, w layout.Widget) D {
-	return cl.button.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+	return cl.Button.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		return layout.Stack{}.Layout(gtx,
 			layout.Expanded(func(gtx layout.Context) layout.Dimensions {
 				tr := gtx.Dp(unit.Dp(cl.Radius.TopRight))
@@ -77,11 +77,11 @@ func (cl *Clickable) Layout(gtx C, w layout.Widget) D {
 				}.Push(gtx.Ops).Pop()
 				clip.Rect{Max: gtx.Constraints.Min}.Push(gtx.Ops).Pop()
 
-				if cl.Hover && cl.button.Hovered() {
+				if cl.Hover && cl.Button.Hovered() {
 					paint.Fill(gtx.Ops, cl.style.HoverColor)
 				}
 
-				for _, c := range cl.button.History() {
+				for _, c := range cl.Button.History() {
 					drawInk(gtx, c, cl.style.Color)
 				}
 				return layout.Dimensions{Size: gtx.Constraints.Min}

@@ -101,7 +101,7 @@ func (c Card) HoverLayout(gtx layout.Context, btn *Clickable, w layout.Widget) l
 					NW: tl, NE: tr, SE: br, SW: bl,
 				}.Push(gtx.Ops).Pop()
 
-				if btn.Hover && btn.button.Hovered() {
+				if btn.Hover && btn.Button.Hovered() {
 					background = btn.style.HoverColor
 				}
 
