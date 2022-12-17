@@ -9,8 +9,8 @@ import (
 	"gioui.org/widget"
 	"wechat_ui/app"
 	"wechat_ui/ui/components"
+	"wechat_ui/ui/page/chat"
 	"wechat_ui/ui/page/contact"
-	"wechat_ui/ui/page/msg"
 	"wechat_ui/ui/page/start"
 	"wechat_ui/ui/v"
 )
@@ -68,7 +68,7 @@ func (mp *MainPage) initNavItems() {
 			Image:         v.MsgIcon,
 			ImageInactive: v.MsgIconInactive,
 			Title:         "消息",
-			PageID:        msg.PageID,
+			PageID:        chat.PageID,
 		},
 		{
 			Clickable:     v.NewClickable(false),
@@ -134,8 +134,8 @@ func (mp *MainPage) HandleUserInteractions() {
 			switch item.PageID {
 			case contact.PageID:
 				pg = contact.NewPage()
-			case msg.PageID:
-				pg = msg.NewPage()
+			case chat.PageID:
+				pg = chat.NewPage()
 			}
 
 			if pg == nil || mp.ID() == mp.CurrentPageID() {

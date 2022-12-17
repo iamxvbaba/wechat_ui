@@ -2,6 +2,7 @@ package ui
 
 import (
 	"wechat_ui/app"
+	"wechat_ui/ui/assets"
 	"wechat_ui/ui/page"
 	"wechat_ui/ui/v"
 	"wechat_ui/ui/values"
@@ -30,6 +31,10 @@ func CreateWindow() (*Window, error) {
 	giouiWindow := giouiApp.NewWindow(giouiApp.MinSize(values.AppWidth, values.AppHeight),
 		giouiApp.Title("wechat"),
 		giouiApp.Decorated(false)) // giouiApp.Decorated(false) 去掉程序顶部默认装饰
+
+	// 全局
+	assets.Window = giouiWindow
+
 	win := &Window{
 		Window:    giouiWindow,
 		navigator: app.NewSimpleWindowNavigator(giouiWindow.Invalidate),

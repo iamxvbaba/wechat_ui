@@ -37,5 +37,5 @@ func register(fnt text.Font, fontByte []byte) {
 }
 
 func getFontByte(path string) ([]byte, error) {
-	return content.ReadFile(path)
+	return Resources.ReadFile(path)
 }

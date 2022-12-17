@@ -3,15 +3,17 @@ package assets
 import (
 	"bytes"
 	"embed"
+	"gioui.org/app"
 	"gioui.org/widget/material"
 	"image"
 	"strings"
 )
 
 //go:embed *
-var content embed.FS
+var Resources embed.FS
 
 var (
+	Window   *app.Window
 	IconList map[string]image.Image
 	Theme    *material.Theme
 )
@@ -29,7 +31,7 @@ func init() {
 }
 
 func Icons() (map[string]image.Image, error) {
-	entries, err := content.ReadDir("icons")
+	entries, err := Resources.ReadDir("icons")
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +43,7 @@ func Icons() (map[string]image.Image, error) {
 			continue
 		}
 
-		imgBytes, err := content.ReadFile("icons/" + entry.Name())
+		imgBytes, err := Resources.ReadFile("icons/" + entry.Name())
 		if err != nil {
 			return nil, err
 		}

@@ -7,7 +7,7 @@ import (
 // SimpleWindowNavigator 使用 PageStack 实现 WindowNavigator 以跟踪显示的页面。
 // 如果此 WindowNavigator 的实例用于显示 Page 或 Modal，则该 Page 或 Modal 将以该导航器作为其父级.
 type SimpleWindowNavigator struct {
-	reloadDisplayFn func()
+	ReloadDisplayFn func()
 	subPages        *PageStack
 
 	modalMutex sync.Mutex
@@ -17,7 +17,7 @@ type SimpleWindowNavigator struct {
 // NewSimpleWindowNavigator creates an instance of a SimpleWindowNavigator.
 func NewSimpleWindowNavigator(reloadDisplayFn func()) *SimpleWindowNavigator {
 	w := &SimpleWindowNavigator{
-		reloadDisplayFn: reloadDisplayFn,
+		ReloadDisplayFn: reloadDisplayFn,
 		subPages:        NewPageStack("main window"),
 	}
 	return w
@@ -147,5 +147,5 @@ func (window *SimpleWindowNavigator) TopModal() Modal {
 // render the entire window's display.
 // Part of the WindowNavigator interface.
 func (window *SimpleWindowNavigator) Reload() {
-	window.reloadDisplayFn()
+	window.ReloadDisplayFn()
 }
