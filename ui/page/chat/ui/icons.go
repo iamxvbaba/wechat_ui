@@ -5,12 +5,17 @@ import (
 	"golang.org/x/exp/shiny/materialdesign/icons"
 )
 
-var NavBack *widget.Icon = func() *widget.Icon {
+var NavBack = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.NavigationArrowBack)
 	return icon
 }()
 
-var Send *widget.Icon = func() *widget.Icon {
+var Send = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.ContentSend)
+	return icon
+}()
+
+var ContentAdd = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ContentAddBox)
 	return icon
 }()

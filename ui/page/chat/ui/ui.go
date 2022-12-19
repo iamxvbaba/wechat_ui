@@ -17,6 +17,7 @@ import (
 	"wechat_ui/ui/pkg/list"
 	"wechat_ui/ui/pkg/ninepatch"
 	"wechat_ui/ui/v"
+	"wechat_ui/ui/values"
 
 	"gioui.org/layout"
 	"gioui.org/op/clip"
@@ -98,6 +99,9 @@ type UI struct {
 	// ContextMenuTarget tracks the message state on which the context
 	// menu is currently acting.
 	ContextMenuTarget *model.Message
+
+	SearchEditor  *widget.Editor
+	AddContactBtn widget.Clickable
 }
 
 // loadNinePatch from the embedded resources package.
@@ -129,6 +133,8 @@ func NewUI(invalidator func(), conf Config) *UI {
 	case "dark":
 		th.UsePalette(apptheme.Dark)
 	}
+
+	ui.SearchEditor = &widget.Editor{}
 
 	ui.Modal.VisibilityAnimation.Duration = time.Millisecond * 250
 
@@ -248,7 +254,16 @@ func (ui *UI) layout(gtx C) D {
 		layout.Rigid(func(gtx C) D {
 			gtx.Constraints.Max.X = gtx.Dp(SidebarMaxWidth)
 			gtx.Constraints.Min = gtx.Constraints.Constrain(gtx.Constraints.Min)
-			return ui.layoutRoomList(gtx)
+			return layout.Flex{
+				Axis: layout.Vertical,
+			}.Layout(gtx,
+				layout.Rigid(func(gtx C) D {
+					return ui.layoutSearch(gtx)
+				}),
+				layout.Flexed(1, func(gtx C) D {
+					return ui.layoutRoomList(gtx)
+				}),
+			)
 		}),
 		layout.Rigid(v.SeparatorVertical(gtx.Constraints.Max.Y, 1, component.WithAlpha(th.Fg, 50)).Layout),
 		layout.Flexed(1, func(gtx C) D {
@@ -345,6 +360,50 @@ func (ui *UI) layoutRoomList(gtx C) D {
 			})
 		}),
 	)
+}
+
+// layoutSearch lays out the search editor.
+func (ui *UI) layoutSearch(gtx C) D {
+	inset := layout.Inset{
+		Top:    values.MarginPadding20,
+		Bottom: values.MarginPadding10,
+	}
+	return inset.Layout(gtx, func(gtx C) D {
+		gtx.Constraints.Min.X = gtx.Constraints.Max.X
+		return layout.Flex{
+			Axis:      layout.Horizontal,
+			Alignment: layout.Middle,
+			Spacing:   layout.SpaceEvenly,
+		}.Layout(gtx, layout.Rigid(func(gtx C) D {
+			gtx.Constraints.Min.X = gtx.Constraints.Max.X / 4 * 3
+			return chatlayout.Rounded(unit.Dp(2)).Layout(gtx, func(gtx C) D {
+				return chatlayout.Background(th.Palette.Surface).Layout(gtx, func(gtx C) D {
+					return layout.UniformInset(unit.Dp(4)).Layout(gtx, func(gtx C) D {
+						for _, e := range ui.SearchEditor.Events() {
+							switch e.(type) {
+							case widget.SubmitEvent:
+								ui.SearchEditor.SetText("")
+							}
+						}
+						ui.SearchEditor.Submit = true
+						ui.SearchEditor.SingleLine = true
+						ed := material.Editor(th.Theme, ui.SearchEditor, "Search")
+						return ed.Layout(gtx)
+					})
+				})
+			})
+		}),
+			layout.Rigid(func(gtx C) D {
+				button := v.NewIconButton(ContentAdd)
+				//button.ChangeColorStyle(&values.ColorStyle{
+				//	Background: th.Palette.Surface,
+				//	Foreground: th.Palette.Surface,
+				//})
+				button.Size = unit.Dp(30)
+				return button.Layout(gtx)
+			}),
+		)
+	})
 }
 
 // layoutEditor lays out the message editor.

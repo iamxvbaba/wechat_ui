@@ -97,7 +97,7 @@ func NewIconButton(icon *widget.Icon) IconButton {
 			Icon:   icon,
 			Button: new(widget.Clickable),
 			Size:   unit.Dp(24),
-			Inset:  layout.UniformInset(unit.Dp(12)),
+			Inset:  layout.UniformInset(unit.Dp(0)),
 		},
 		&values.ColorStyle{Foreground: values.Gray1},
 	}
@@ -209,6 +209,7 @@ func (bl ButtonLayout) Layout(gtx layout.Context, w layout.Widget) layout.Dimens
 }
 
 func (ib IconButton) ChangeColorStyle(colorStyle *values.ColorStyle) {
+	ib.colorStyle = colorStyle
 }
 
 func (ib IconButton) Layout(gtx layout.Context) layout.Dimensions {

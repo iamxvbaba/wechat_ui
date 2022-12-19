@@ -2,7 +2,11 @@ package components
 
 import (
 	"gioui.org/layout"
+	"gioui.org/op/paint"
 	"gioui.org/unit"
+	"gioui.org/widget"
+	"wechat_ui/ui/assets"
+	"wechat_ui/ui/pkg/widget/material"
 	"wechat_ui/ui/v"
 	"wechat_ui/ui/values"
 )
@@ -57,6 +61,23 @@ func (nd *NavDrawer) Layout(gtx C) D {
 		Axis:    nd.axis,
 		Spacing: layout.SpaceBetween,
 	}.Layout(gtx,
+		// 头像
+		layout.Rigid(func(gtx C) D {
+			inset := layout.Inset{Top: values.MarginPadding26, Bottom: values.MarginPadding26}
+			img := material.Image{
+				Image: widget.Image{
+					Src: paint.NewImageOp(assets.IconList["avatar"]),
+					Fit: widget.Contain,
+				},
+				Radii:  values.MarginPadding2,
+				Height: values.MarginPadding36,
+				Width:  values.MarginPadding36,
+			}
+			return inset.Layout(gtx, func(gtx C) D {
+				gtx.Constraints.Min.X = gtx.Constraints.Max.X
+				return nd.direction.Layout(gtx, img.Layout)
+			})
+		}),
 		// 页面导航类
 		layout.Rigid(func(gtx C) D {
 			list := layout.List{Axis: nd.axis, Alignment: nd.alignment}
