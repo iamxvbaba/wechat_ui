@@ -103,6 +103,7 @@ type UI struct {
 
 	SearchEditor  *widget.Editor
 	AddContactBtn v.IconButton
+	SearchHeight  int
 }
 
 // loadNinePatch from the embedded resources package.
@@ -289,6 +290,20 @@ func (ui *UI) layout(gtx C) D {
 		}),
 	)
 }
+func (ui *UI) layoutChatBar(gtx C) D {
+	gtx.Constraints.Max.Y = ui.SearchHeight
+	gtx.Constraints.Min = gtx.Constraints.Max
+	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+		layout.Flexed(1, func(gtx C) D {
+			return layout.Center.Layout(gtx, func(gtx C) D {
+				room := ui.Rooms.Active()
+				return material.H5(th.Theme, room.Name).Layout(gtx)
+			})
+		}),
+		// 分割线
+		layout.Rigid(v.NewSeparator(component.WithAlpha(th.Fg, 50)).Layout),
+	)
+}
 
 // layoutChat lays out the chat interface with associated controls.
 func (ui *UI) layoutChat(gtx C) D {
@@ -303,6 +318,7 @@ func (ui *UI) layoutChat(gtx C) D {
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(gtx,
+		layout.Rigid(ui.layoutChatBar),
 		layout.Flexed(1, func(gtx C) D {
 			return listStyle.Layout(gtx,
 				state.UpdatedLen(&list.List),
@@ -406,7 +422,7 @@ func (ui *UI) layoutSearch(gtx C) D {
 		Top:    values.MarginPadding20,
 		Bottom: values.MarginPadding10,
 	}
-	return inset.Layout(gtx, func(gtx C) D {
+	dims := inset.Layout(gtx, func(gtx C) D {
 		gtx.Constraints.Min.X = gtx.Constraints.Max.X
 		return layout.Flex{
 			Axis:      layout.Horizontal,
@@ -440,6 +456,8 @@ func (ui *UI) layoutSearch(gtx C) D {
 			}),
 		)
 	})
+	ui.SearchHeight = dims.Size.Y
+	return dims
 }
 
 // layoutEditor lays out the message editor.
