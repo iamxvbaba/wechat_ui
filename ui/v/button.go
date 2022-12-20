@@ -91,7 +91,7 @@ func NewButtonLayout() ButtonLayout {
 	return ButtonLayout{material.ButtonLayout(assets.Theme, new(widget.Clickable))}
 }
 
-func NewIconButton(icon *widget.Icon) IconButton {
+func NewIconButton(icon *widget.Icon, fg, bg color.NRGBA) IconButton {
 	return IconButton{
 		IconButtonStyle{
 			Icon:   icon,
@@ -99,7 +99,7 @@ func NewIconButton(icon *widget.Icon) IconButton {
 			Size:   unit.Dp(24),
 			Inset:  layout.UniformInset(unit.Dp(0)),
 		},
-		&values.ColorStyle{Foreground: values.Gray1},
+		&values.ColorStyle{Foreground: fg, Background: bg},
 	}
 }
 

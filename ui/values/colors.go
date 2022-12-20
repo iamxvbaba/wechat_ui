@@ -29,7 +29,7 @@ var (
 	LightBlue4       = rgb(0xBBDEFF)
 	LightBlue5       = rgb(0x70CBFF)
 	LightBlue6       = rgb(0x4B91D8)
-	Gray1            = rgb(0x3d5873)
+	Gray1            = rgb(0xFFD1D1D1)
 	Gray2            = rgb(0xe6eaed)
 	Gray3            = rgb(0xc4cbd2)
 	Gray4            = rgb(0xf3f5f6)

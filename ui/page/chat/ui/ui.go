@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 	"wechat_ui/ui/assets"
 	"wechat_ui/ui/page/chat/appwidget/apptheme"
@@ -101,7 +102,7 @@ type UI struct {
 	ContextMenuTarget *model.Message
 
 	SearchEditor  *widget.Editor
-	AddContactBtn widget.Clickable
+	AddContactBtn v.IconButton
 }
 
 // loadNinePatch from the embedded resources package.
@@ -150,6 +151,9 @@ func NewUI(invalidator func(), conf Config) *UI {
 			return img
 		},
 	}
+
+	ui.AddContactBtn = v.NewIconButton(ContentAdd, values.Gray1, th.Bg)
+	ui.AddContactBtn.Size = unit.Dp(30)
 
 	// Generate most of the model data.
 	var (
@@ -232,6 +236,7 @@ func NewUI(invalidator func(), conf Config) *UI {
 
 // Layout the application UI.
 func (ui *UI) Layout(gtx C) D {
+
 	return ui.Loader.Frame(gtx, ui.layout)
 }
 
@@ -260,7 +265,12 @@ func (ui *UI) layout(gtx C) D {
 				layout.Rigid(func(gtx C) D {
 					return ui.layoutSearch(gtx)
 				}),
-				layout.Flexed(1, func(gtx C) D {
+				layout.Rigid(func(gtx C) D {
+					// 搜索结果
+					if searchR := ui.layoutSearchResult(); searchR != nil {
+						return searchR(gtx)
+					}
+					// 会话列表
 					return ui.layoutRoomList(gtx)
 				}),
 			)
@@ -284,12 +294,12 @@ func (ui *UI) layout(gtx C) D {
 func (ui *UI) layoutChat(gtx C) D {
 	room := ui.Rooms.Active()
 	var (
-		scrollWidth unit.Dp
-		list        = &room.List
-		state       = room.ListState
+		//scrollWidth unit.Dp
+		list  = &room.List
+		state = room.ListState
 	)
 	listStyle := material.List(th.Theme, list)
-	scrollWidth = listStyle.ScrollbarStyle.Width()
+	//scrollWidth = listStyle.ScrollbarStyle.Width()
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(gtx,
@@ -300,31 +310,32 @@ func (ui *UI) layoutChat(gtx C) D {
 			)
 		}),
 		layout.Rigid(func(gtx C) D {
-			return chatlayout.Background(th.Palette.BgSecondary).Layout(gtx, func(gtx C) D {
-				if ui.AddBtn.Clicked() {
-					active := ui.Rooms.Active()
-					active.SendLocal(active.Editor.Text())
-					active.Editor.SetText("")
-				}
-				if ui.DeleteBtn.Clicked() {
-					serial := ui.ContextMenuTarget.Serial()
-					ui.Rooms.Active().DeleteRow(serial)
-				}
-				return layout.Inset{
-					Bottom: unit.Dp(8),
-					Top:    unit.Dp(8),
-				}.Layout(gtx, func(gtx C) D {
-					gutter := chatlayout.Gutter()
-					gutter.RightWidth = gutter.RightWidth + scrollWidth
-					return gutter.Layout(gtx,
-						nil,
-						func(gtx C) D {
-							return ui.layoutEditor(gtx)
-						},
-						material.IconButton(th.Theme, &ui.AddBtn, Send, "Send").Layout,
-					)
-				})
-			})
+			return ui.layoutEditor2(gtx)
+			//return chatlayout.Background(th.Palette.BgSecondary).Layout(gtx, func(gtx C) D {
+			//	if ui.AddBtn.Clicked() {
+			//		active := ui.Rooms.Active()
+			//		active.SendLocal(active.Editor.Text())
+			//		active.Editor.SetText("")
+			//	}
+			//	if ui.DeleteBtn.Clicked() {
+			//		serial := ui.ContextMenuTarget.Serial()
+			//		ui.Rooms.Active().DeleteRow(serial)
+			//	}
+			//	return layout.Inset{
+			//		Bottom: unit.Dp(8),
+			//		Top:    unit.Dp(8),
+			//	}.Layout(gtx, func(gtx C) D {
+			//		gutter := chatlayout.Gutter()
+			//		gutter.RightWidth = gutter.RightWidth + scrollWidth
+			//		return gutter.Layout(gtx,
+			//			nil,
+			//			func(gtx C) D {
+			//				return ui.layoutEditor(gtx)
+			//			},
+			//			material.IconButton(th.Theme, &ui.AddBtn, Send, "Send").Layout,
+			//		)
+			//	})
+			//})
 		}),
 	)
 }
@@ -361,6 +372,33 @@ func (ui *UI) layoutRoomList(gtx C) D {
 		}),
 	)
 }
+func (ui *UI) layoutSearchResult() layout.Widget {
+	searchContent := strings.TrimSpace(ui.SearchEditor.Text())
+	for !ui.SearchEditor.Focused() || len(searchContent) == 0 {
+		return nil
+	}
+	searchContent = strings.ToLower(searchContent)
+	var r Room
+	has := false
+	for _, roomInfo := range ui.Rooms.List {
+		if strings.ToLower(roomInfo.Name) == searchContent {
+			has = true
+			r = roomInfo
+			break
+		}
+	}
+	if !has {
+		return layout.Spacer{}.Layout
+	}
+
+	latest := r.Latest()
+	return apptheme.Room(th.Theme, &r.Interact, &apptheme.RoomConfig{
+		Name:    r.Room.Name,
+		Image:   r.Room.Image,
+		Content: latest.Content,
+		SentAt:  latest.SentAt,
+	}).Layout
+}
 
 // layoutSearch lays out the search editor.
 func (ui *UI) layoutSearch(gtx C) D {
@@ -377,7 +415,7 @@ func (ui *UI) layoutSearch(gtx C) D {
 		}.Layout(gtx, layout.Rigid(func(gtx C) D {
 			gtx.Constraints.Min.X = gtx.Constraints.Max.X / 4 * 3
 			return chatlayout.Rounded(unit.Dp(2)).Layout(gtx, func(gtx C) D {
-				return chatlayout.Background(th.Palette.Surface).Layout(gtx, func(gtx C) D {
+				return chatlayout.Background(values.Gray1).Layout(gtx, func(gtx C) D {
 					return layout.UniformInset(unit.Dp(4)).Layout(gtx, func(gtx C) D {
 						for _, e := range ui.SearchEditor.Events() {
 							switch e.(type) {
@@ -387,6 +425,7 @@ func (ui *UI) layoutSearch(gtx C) D {
 						}
 						ui.SearchEditor.Submit = true
 						ui.SearchEditor.SingleLine = true
+						ui.SearchEditor.MaxLen = 10
 						ed := material.Editor(th.Theme, ui.SearchEditor, "Search")
 						return ed.Layout(gtx)
 					})
@@ -394,13 +433,10 @@ func (ui *UI) layoutSearch(gtx C) D {
 			})
 		}),
 			layout.Rigid(func(gtx C) D {
-				button := v.NewIconButton(ContentAdd)
-				//button.ChangeColorStyle(&values.ColorStyle{
-				//	Background: th.Palette.Surface,
-				//	Foreground: th.Palette.Surface,
-				//})
-				button.Size = unit.Dp(30)
-				return button.Layout(gtx)
+				for ui.AddContactBtn.Button.Clicked() {
+					fmt.Println("点击添加好友")
+				}
+				return ui.AddContactBtn.Layout(gtx)
 			}),
 		)
 	})

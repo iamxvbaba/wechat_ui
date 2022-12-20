@@ -100,5 +100,5 @@ var (
 	TextSize32   = unit.Sp(32)
 
 	AppWidth  = unit.Dp(800)
-	AppHeight = unit.Dp(600)
+	AppHeight = unit.Dp(650)
 )

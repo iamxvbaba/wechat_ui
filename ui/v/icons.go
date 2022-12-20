@@ -11,4 +11,11 @@ var (
 	SpIconInactive = NewImage(assets.IconList["sp_inactive"])
 	PhoneInactive  = NewImage(assets.IconList["phone_inactive"])
 	MoreInactive   = NewImage(assets.IconList["more_inactive"])
+
+	Emoticon   = NewImage(assets.IconList["emoticon"])
+	File       = NewImage(assets.IconList["file"])
+	Screenshot = NewImage(assets.IconList["screenshots"])
+
+	Circle = NewImage(assets.IconList["circle"])
+	Call   = NewImage(assets.IconList["call"])
 )
