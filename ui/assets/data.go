@@ -25,9 +25,9 @@ func init() {
 	}
 	IconList = icons
 
-	fc := FontCollection()
+	//fc := FontCollection()
 	//text.NewShaper(fc)
-	Theme = material.NewTheme(fc)
+	Theme = material.NewTheme()
 }
 
 func Icons() (map[string]image.Image, error) {
